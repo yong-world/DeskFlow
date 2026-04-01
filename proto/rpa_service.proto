@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+option csharp_namespace = "DesktopAgent.Grpc";
+
+package rpa;
+
+// 桌面自动化服务 — C# 端实现，Python 端调用
+service DesktopAutomation {
+    // 查找控件
+    rpc FindElement (FindElementRequest) returns (FindElementResponse);
+    // 执行操作
+    rpc PerformAction (ActionRequest) returns (ActionResponse);
+    // 获取控件树
+    rpc GetUITree (UITreeRequest) returns (UITreeResponse);
+    // 截屏
+    rpc CaptureScreen (CaptureRequest) returns (CaptureResponse);
+    // 录制事件流（服务端流式）
+    rpc StartRecording (RecordRequest) returns (stream RecordEvent);
+}
+
+// 流程引擎服务 — Python 端实现，设计器端调用
+service WorkflowEngine {
+    // 执行流程
+    rpc RunWorkflow (WorkflowRequest) returns (stream StepResult);
+    // 暂停/恢复
+    rpc PauseWorkflow (PauseRequest) returns (PauseResponse);
+}
+
+// ============ Messages ============
+
+message FindElementRequest {
+    string strategy = 1;        // "uia", "uia_path", "name", "automation_id"
+    string value = 2;
+    string window_title = 3;    // 目标窗口标题（可选）
+    int32 timeout_ms = 4;
+}
+
+message FindElementResponse {
+    bool found = 1;
+    string automation_id = 2;
+    string name = 3;
+    string control_type = 4;
+    string class_name = 5;
+    BoundingRect bounding_rect = 6;
+    string error = 7;
+}
+
+message ActionRequest {
+    string action = 1;          // "click", "type_text", "set_value", etc.
+    FindElementRequest target = 2;
+    map<string, string> params = 3;
+}
+
+message ActionResponse {
+    bool success = 1;
+    string error = 2;
+    string value_after = 3;
+}
+
+message UITreeRequest {
+    string window_title = 1;
+    int32 max_depth = 2;
+}
+
+message UITreeResponse {
+    string tree_json = 1;       // 序列化的控件树 JSON
+}
+
+message CaptureRequest {
+    bool full_screen = 1;
+    BoundingRect region = 2;    // 指定区域截图（可选）
+}
+
+message CaptureResponse {
+    bytes image_data = 1;       // PNG 字节流
+    int32 width = 2;
+    int32 height = 3;
+}
+
+message RecordRequest {
+    bool capture_screenshots = 1;
+    bool capture_ui_info = 2;
+}
+
+message RecordEvent {
+    string event_id = 1;
+    string timestamp = 2;
+    string event_type = 3;      // "mouse_click", "keyboard_input", etc.
+    string event_json = 4;      // 完整事件 JSON
+}
+
+message WorkflowRequest {
+    string workflow_yaml = 1;   // 流程定义 YAML 内容
+    map<string, string> variables = 2;
+}
+
+message StepResult {
+    string step_id = 1;
+    string step_name = 2;
+    string status = 3;          // "success", "failed", "skipped"
+    int32 duration_ms = 4;
+    string error = 5;
+    string screenshot_path = 6;
+}
+
+message PauseRequest {
+    string action = 1;          // "pause" or "resume"
+}
+
+message PauseResponse {
+    string current_state = 1;
+}
+
+message BoundingRect {
+    int32 x = 1;
+    int32 y = 2;
+    int32 width = 3;
+    int32 height = 4;
+}

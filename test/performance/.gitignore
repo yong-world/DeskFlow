@@ -1,0 +1,10 @@
+# Build outputs
+bin/
+obj/
+
+# Test results
+performance_results.json
+
+# Python cache
+__pycache__/
+*.pyc

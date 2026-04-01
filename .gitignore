@@ -1,0 +1,43 @@
+# ============ C# / .NET ============
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.nupkg
+*.snupkg
+
+# ============ Python ============
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+.venv/
+*.egg
+
+# ============ uv ============
+# uv.lock is committed for reproducible builds
+
+# ============ IDE ============
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============ OS ============
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ============ Project ============
+recordings/
+runs/
+*.log
